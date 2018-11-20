@@ -105,3 +105,6 @@ venv.bak/
 
 # pycharm files
 .idea/
+
+# compiled qml files
+*.qmlc
