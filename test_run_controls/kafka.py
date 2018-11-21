@@ -5,6 +5,7 @@ import det_spec_map.SpectraDetectorMapping
 import run_info.InfoTypes
 import run_info.RunInfo
 import run_info.RunStart
+import run_info.RunStop
 
 import pykafka
 
@@ -77,9 +78,7 @@ def send_start_run_message(run_number: int,
 
     name = builder.CreateString(instrument_name)
     run_info.RunStart.RunStartStart(builder)
-    # time.time_ns() isn't available in python < 3.7, and this targets 3.5
-    current_time_ns = int(time.time() * (10 ** 9))
-    run_info.RunStart.RunStartAddStartTime(builder, current_time_ns)
+    run_info.RunStart.RunStartAddStartTime(builder, current_time_ns())
     run_info.RunStart.RunStartAddRunNumber(builder, run_number)
     run_info.RunStart.RunStartAddInstrumentName(builder, name)
     run_start = run_info.RunStart.RunStartEnd(builder)
@@ -94,3 +93,36 @@ def send_start_run_message(run_number: int,
     message = prepare_flatbuffer_message(builder, b'ba57')
     topic_name = "{}_runInfo".format(instrument_name).encode()
     send_message(message, topic_name, broker_address, broker_version)
+
+
+def send_stop_run_message(run_number: int,
+                          instrument_name: str,
+                          broker_address: str=default_broker_address,
+                          broker_version: str=default_broker_version):
+    """Send a run stop message to topic <INSTRUMENT>_runInfo on the given broker"""
+    builder = flatbuffers.Builder(0)
+
+    run_info.RunStop.RunStopStart(builder)
+    run_info.RunStop.RunStopAddStopTime(builder, current_time_ns())
+    run_info.RunStop.RunStopAddRunNumber(builder, run_number)
+    run_stop = run_info.RunStop.RunStopEnd(builder)
+
+    run_info.RunInfo.RunInfoStart(builder)
+    run_info.RunInfo.RunInfoAddInfoTypeType(builder, run_info.InfoTypes.InfoTypes().RunStop)
+    run_info.RunInfo.RunInfoAddInfoType(builder, run_stop)
+    info = run_info.RunInfo.RunInfoEnd(builder)
+
+    builder.Finish(info)
+
+    message = prepare_flatbuffer_message(builder, b'ba57')
+    topic_name = "{}_runInfo".format(instrument_name).encode()
+    send_message(message, topic_name, broker_address, broker_version)
+
+
+def current_time_ns():
+    """
+    Returns the number of nanoseconds since the unix epoch
+
+    Required as time.time_ns() is only in python 3.7+ and we're targeting 3.5
+    """
+    return int(time.time() * (10 ** 9))
