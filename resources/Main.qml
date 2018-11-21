@@ -66,7 +66,8 @@ ApplicationWindow {
                 anchors.top: parent.top
                 anchors.right: filenameField.right
                 labelText: "Run number:"
-                editorText: "1"
+                editorText: startRunContainer.runNumber
+                onEditingFinished: startRunContainer.runNumber = parseInt(editorText)
                 validator: IntValidator {}
             }
 
