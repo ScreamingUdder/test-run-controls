@@ -45,9 +45,16 @@ class KafkaConnector(QObject):
         print("start run called")
         # Send a detector spectrum map message to topic <INSTRUMENT>_detSpecMap
         detectors, spectra = self.load_spectrum_file(spectrum_mapping_file_url)
-        kafka.send_detector_spectrum_map_message(detectors, spectra, self.instrument_name, self.broker_address)
-        # Send a run start message to <INSTRUMENT>_runInfo
-        kafka.send_start_run_message(run_number, self.instrument_name, self.broker_address)
+        kafka.send_detector_spectrum_map_message(detectors,
+                                                 spectra,
+                                                 self.instrument_name,
+                                                 self.broker_address,
+                                                 self.broker_version)
+        # Send a run start message to topic <INSTRUMENT>_runInfo
+        kafka.send_start_run_message(run_number,
+                                     self.instrument_name,
+                                     self.broker_address,
+                                     self.broker_version)
 
     @staticmethod
     def load_spectrum_file(file_url: QUrl):
@@ -65,3 +72,9 @@ class KafkaConnector(QObject):
             spectra.append(int(spectrum))
 
         return detectors, spectra
+
+    @Slot(int)
+    def stop_run(self, run_number: int):
+        print("stop run called")
+        # Send a run stop message to topic <INSTRUMENT>_runInfo
+        kafka.send_stop_run_message(run_number, self.instrument_name, self.broker_address, self.broker_version)

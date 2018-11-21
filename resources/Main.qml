@@ -64,9 +64,10 @@ ApplicationWindow {
             LabeledTextField {
                 id: runNumberField
                 anchors.top: parent.top
-                anchors.right: filenameField.right
+                anchors.right: parent.right
                 labelText: "Run number:"
-                editorText: "1"
+                editorText: startRunContainer.runNumber
+                onEditingFinished: startRunContainer.runNumber = parseInt(editorText)
                 validator: IntValidator {}
             }
 
@@ -94,7 +95,36 @@ ApplicationWindow {
                 nameFilters: ["DAT files (*.dat *.DAT)", "All files (*)"]
                 onAccepted: startRunContainer.mappingFile = fileUrl
             }
+        }
 
+        Frame {
+            id: stopRunContainer
+            anchors.top: startRunContainer.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            contentHeight: stopRunNumberField.height
+
+            property int runNumber: 1
+            property url mappingFile
+
+            Button {
+                anchors.verticalCenter: stopRunNumberField.verticalCenter
+                anchors.left: parent.left
+                id: stopRunButton
+                text: "Stop run"
+                onClicked: kafka.stop_run(stopRunContainer.runNumber, stopRunContainer.mappingFile)
+            }
+
+            // Field for run number
+            LabeledTextField {
+                id: stopRunNumberField
+                anchors.top: parent.top
+                anchors.right: parent.right
+                labelText: "Run number:"
+                editorText: stopRunContainer.runNumber
+                onEditingFinished: stopRunContainer.runNumber = parseInt(editorText)
+                validator: IntValidator {}
+            }
         }
     }
 
