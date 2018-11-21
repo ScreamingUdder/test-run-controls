@@ -1,2 +1,4 @@
 PySide2==5.11.2
 flake8==3.5.0
+pykafka==2.8.0
+flatbuffers==1.10

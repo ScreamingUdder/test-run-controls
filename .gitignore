@@ -108,3 +108,9 @@ venv.bak/
 
 # compiled qml files
 *.qmlc
+
+# spectrum data files
+*.dat
+
+# windows executable files
+*.exe

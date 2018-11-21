@@ -1,7 +1,11 @@
 import sys
 from os import path
 from PySide2.QtCore import QUrl, QObject
-from PySide2.QtQml import QQmlApplicationEngine
+from PySide2.QtQml import QQmlApplicationEngine, qmlRegisterType
+from test_run_controls.kafka_connector import KafkaConnector
+
+
+qmlRegisterType(KafkaConnector, 'Kafka', 1, 0, 'KafkaConnector')
 
 
 class Application(QQmlApplicationEngine):
