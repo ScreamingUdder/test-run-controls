@@ -64,7 +64,7 @@ ApplicationWindow {
             LabeledTextField {
                 id: runNumberField
                 anchors.top: parent.top
-                anchors.right: filenameField.right
+                anchors.right: parent.right
                 labelText: "Run number:"
                 editorText: startRunContainer.runNumber
                 onEditingFinished: startRunContainer.runNumber = parseInt(editorText)
